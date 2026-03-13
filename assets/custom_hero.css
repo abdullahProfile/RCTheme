@@ -1,0 +1,14 @@
+.custom_hero {
+  width: 100%;
+  max-width: 880px;
+  margin-inline: auto;
+}
+
+.custom_hero_link {
+  max-width: max-content;
+
+  &:has(".arrow") {
+    display: flex;
+    align-items: center;
+  }
+}

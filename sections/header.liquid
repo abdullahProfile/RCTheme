@@ -8,28 +8,86 @@
     --padding-left: {{ section.settings.header_padding_left }}px;
     --padding-top-mlb: {{ section.settings.padding_top_mbl }}px;
     --padding-bottom-mbl: {{ section.settings.padding_bottom_mbl }}px;
-    --padding-right: {{ section.settings.padding_right_mbl }}px;
+    --padding-right-mbl: {{ section.settings.padding_right_mbl }}px;
     --padding-left-mbl: {{ section.settings.padding_left_mbl }}px;
     --link-gap: {{ section.settings.menu_gap }}px;
     --link-gap-mbl: {{ section.settings.menu_gap_mbl }}px;
+    --btns-padding-inline: {{ section.settings.btns_padding_inline }}px;
+    --btns-padding-block: {{ section.settings.btns_padding_block }}px;
+  }
+
+  {% if section.settings.header_position == "sticky" %}
+    .header-custom  {
+      position: sticky;
+      top: 0;
+      background: #fff;
+    }
+  {% endif %}
+
+  {% if section.settings.logo_center %}
+    .custome_header__logo {
+        grid-column: 2;
+
+      }
+
+      .custome_header__actions{
+        grid-column: 3;
+      }
+
+      .custome_header__menu{
+        grid-column: 1;
+        grid-row: 1;
+    }
+  {% endif %}
+
+  @media (max-width: 1024px) {
+    {% if section.settings.iscenter %}
+      .custome_header__logo {
+        grid-column: 2;
+      }
+
+      .custome_header__actions{
+        grid-column: 3;
+        place-self: self-start;
+      }
+
+      .custome_header__menu-open{
+        grid-column: 1;
+        grid-row: 1;
+        place-self: self-start;
+      }
+
+      {% else %}
+        .custome_header__logo {
+          grid-column: 1;
+        }
+
+        .custome_header__actions {
+          grid-column: 2;
+        }
+
+        .custome_header__menu-open {
+          grid-column: 3;
+          grid-row: 1
+        }
+    {% endif %}
   }
 {% endstyle %}
 
 <div id="custome__header-{{ section.id }}" class="custome_header">
-  <div class="custome_header__container">
 
-    {% if settings.logo %}
-      <a href="{{ routes.root_url }}" class="custome_header__logo">
-        <img src="{{ settings.logo | image_url }}" alt="logo">
-      </a>
+  <a href="{{ routes.root_url }}" class="custome_header__logo">
+    {% if settings.logo != blank %}
+      <img src="{{ settings.logo | image_url: width: 300 }}" alt="logo">
+    {% elsif section.settings.header_logo != blank %}
+      <img src="{{ section.settings.header_logo | image_url: width: 300 }}" alt="logo">
     {% else %}
-      <a href="{{ routes.root_url }}" class="custome_header__logo">
-        <img src="{{ section.settings.header_logo | image_url }}" alt="logo">
-      </a>
+      <img src="{{ 'logo.svg' | asset_url }}" alt="logo">
     {% endif %}
+  </a>
 
 
-      <nav class="custome_header__menu">
+    <nav class="custome_header__menu">
       {% assign menu = linklists[section.settings.main_menu] %}
         {% for link in menu.links %}
           {% if link.url != blank %}
@@ -43,7 +101,7 @@
           <img src="{{ 'close.svg' | asset_url }}" alt="close menu">
         </button>
 
-      </nav>
+    </nav>
 
 
     <div class="custome_header__actions">
@@ -69,8 +127,6 @@
         <img src="{{ 'open.svg' | asset_url }}" alt="open menu">
       </button>
     {% endif %}
-
-  </div>
 </div>
 
 {% stylesheet %}
@@ -85,16 +141,16 @@
     gap: var(--link-gap);
   }
 
+  .btn {
+    padding-inline: var(--btns-padding-inline);
+    padding-block: var(--btns-padding-block);
+  }
   @media (max-width: 1024px) {
     .custome_header {
       padding-top: var(--padding-top-mlb);
       padding-bottom: var(--padding-bottom-mbl);
       padding-right: var(--padding-right-mbl);
       padding-left: var(--padding-left-mbl);
-    }
-
-    .custome_header__container {
-      padding-right: var(--padding-right);
     }
 
     .custome_header__menu {
@@ -109,6 +165,7 @@
  {
   "name": "Custome Header",
   "tag": "header",
+  "class": "header-custom",
 
   "disabled_on": {
     "groups": ["footer", "aside"]
@@ -162,7 +219,25 @@
 
     {
       "type": "header",
-      "content": "Settings"
+      "content": "Desktop"
+    },
+
+    {
+      "type": "select",
+      "id": "header_position",
+      "label": "Header Position",
+      "options": [
+        {"value": "sticky", "label": "sticky"},
+        {"value": "static", "label": "static"}
+      ],
+      "default":"static"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "logo_center",
+      "label": "Is Logo Center",
+      "default": false
     },
     {
       "type": "range",
@@ -216,8 +291,15 @@
     },
     {
       "type": "header",
-      "content": "Mobile Settings"
+      "content": "Mobile"
     },
+    {
+      "type": "checkbox",
+      "id": "iscenter",
+      "label": "Logo in Center",
+      "default": false
+    },
+
     {
       "type": "range",
       "id": "padding_top_mbl",
@@ -267,6 +349,26 @@
       "unit": "px",
       "step": 2,
       "default": 10,
+    },
+    {
+      "type": "range",
+      "id": "btns_padding_inline",
+      "label": "Space Horizontal",
+      "min": 0,
+      "max": 100,
+      "unit": "px",
+      "step": 1,
+      "default": 33
+    },
+    {
+      "type": "range",
+      "id": "btns_padding_block",
+      "label": "Space Vertical",
+      "min": 0,
+      "max": 100,
+      "unit": "px",
+      "step": 1,
+      "default": 13
     },
   ],
   "presets": [

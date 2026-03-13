@@ -435,9 +435,15 @@
         "gap_between_moible": 18,
         "padding_inline": 0
       }
-    }
+    },
+
+    "hero": {
+      "type": "hero",
+      "settings": {}
+    },
   },
   "order": [
+    "hero",
     "slideshow_GaEEdq",
     "featured_collection",
     "image_with_text_G6WgMw",
