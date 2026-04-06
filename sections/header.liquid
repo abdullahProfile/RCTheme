@@ -87,21 +87,53 @@
   </a>
 
 
-    <nav class="custome_header__menu">
-      {% assign menu = linklists[section.settings.main_menu] %}
-        {% for link in menu.links %}
-          {% if link.url != blank %}
-            <a href="{{ link.url }}" class="{% if link.active %}active{% endif %}">
-              {{ link.title }}
-            </a>
-          {% endif %}
-        {% endfor %}
+<nav class="custome_header__menu">
+  {% assign menu = linklists[section.settings.main_menu] %}
+  {% for link in menu.links %}
+    <div class="menu-item-wrapper {% if link.links != blank %}has-mega-menu{% endif %}">
+      <a href="{{ link.url }}" class="{% if link.active %}active{% endif %} main-link">
+        {{ link.title }}
+      </a>
 
-        <button class="custome_header__menu-close">
-          <img src="{{ 'close.svg' | asset_url }}" alt="close menu">
-        </button>
+      {% if link.links != blank %}
+        <div class="mega-menu">
+          <div class="mega-menu__inner">
+            {% for childlink in link.links %}
+              <div class="mega-menu__column">
+                {% if childlink.type == 'collection_link' and childlink.object.image %}
+                  <a href="{{ childlink.url }}" class="mega-menu__image-wrapper">
+                    <img 
+                      src="{{ childlink.object.image | image_url: width: 400 }}" 
+                      alt="{{ childlink.title | escape }}"
+                      loading="lazy"
+                      class="mega-menu__img"
+                    >
+                  </a>
+                {% endif %}
 
-    </nav>
+                <a href="{{ childlink.url }}" class="mega-menu__column-title">{{ childlink.title }}</a>
+
+                {% if childlink.links != blank %}
+                  <ul class="mega-menu__list">
+                    {% for grandchildlink in childlink.links %}
+                      <li>
+                        <a href="{{ grandchildlink.url }}">{{ grandchildlink.title }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <button class="custome_header__menu-close">
+    <img src="{{ 'close.svg' | asset_url }}" alt="close menu">
+  </button>
+</nav>
 
 
     <div class="custome_header__actions">
@@ -157,6 +189,80 @@
       gap: var(--link-gap-mbl);
     }
   }
+
+  /* Layout for the parent items */
+.custome_header__menu {
+  display: flex;
+  align-items: center;
+}
+
+.menu-item-wrapper {
+  position: static; /* This allows the mega menu to span the full header width */
+}
+
+/* Hide Mega Menu by default */
+.mega-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  border-top: 1px solid #eee;
+  z-index: 100;
+}
+
+/* Show on hover */
+.menu-item-wrapper:hover .mega-menu {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Internal Grid */
+.mega-menu__inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Adjust columns as needed */
+  gap: 30px;
+  padding: 40px var(--padding-left);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.mega-menu__column-title {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 15px;
+  color: #000;
+  text-decoration: none;
+}
+
+.mega-menu__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mega-menu__list li {
+  margin-bottom: 8px;
+}
+
+.mega-menu__list a {
+  text-decoration: none;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.mega-menu__list a:hover {
+  color: #000;
+}
+
+/* Ensure the header container allows for absolute positioning */
+.custome_header {
+  position: relative;
+}
 {% endstylesheet %}
 
 <script src="{{ 'header.js' | asset_url }}" defer></script>
